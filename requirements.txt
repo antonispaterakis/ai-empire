@@ -1,5 +1,6 @@
 crewai==1.10.1
 crewai-tools==1.10.1
+ddgs==9.14.4
 google-api-python-client>=2.100.0
 langchain-community==0.4.1
 langchain-google-genai==4.2.1
