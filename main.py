@@ -1,14 +1,12 @@
 
 
-import os
+from dotenv import load_dotenv
 from crewai import Agent, Task, Crew, LLM
 from crewai.tools import tool
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.tools import DuckDuckGoSearchRun
 
-# 1. Βάλε το νέο σου κλειδί εδώ "καρφωτά"
-api_key = "" 
-os.environ["GOOGLE_API_KEY"] = api_key
+load_dotenv()
 
 # 2. ΤΑ ΜΟΝΑ ΕΝΕΡΓΑ ΜΟΝΤΕΛΑ (Τέρμα τα 404)
 gm_llm = ChatGoogleGenerativeAI(model="gemini-3.1-pro-preview")

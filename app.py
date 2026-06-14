@@ -1,16 +1,15 @@
-import os
 import streamlit as st
+from dotenv import load_dotenv
 from crewai import Agent, Task, Crew
 from crewai.tools import tool
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.tools import DuckDuckGoSearchRun
 
+load_dotenv()
+
 st.set_page_config(page_title="10-Agent AI Empire", page_icon="👑", layout="wide")
 st.title("👑 The 10-Agent Content Factory")
 st.markdown("Βάλε το θέμα σου και άσε τους 10 υπαλλήλους σου να σου φτιάξουν όλο το βίντεο.")
-
-api_key = "" 
-os.environ["GOOGLE_API_KEY"] = api_key
 
 llm_model = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
 search_tool_raw = DuckDuckGoSearchRun()

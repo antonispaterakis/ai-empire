@@ -15,7 +15,7 @@ Output: `final_script.txt`
 ## What's Needed to Finish
 
 - Integrate YouTube Analytics — the pipeline should learn from real performance data (views, retention, CTR) and feed that back into the scriptwriting agent to improve future scripts.
-- The API key is hardcoded in `main.py` — move to `.env` before any further development.
+- [x] ~~The API key is hardcoded in `main.py` — move to `.env` before any further development.~~ Done: both `main.py` and `app.py` now load `GOOGLE_API_KEY` from `.env` via `python-dotenv`.
 
 ## Notes
 
