@@ -66,9 +66,68 @@ The new model adds native multi-agent orchestration support, meaning teams of AI
 Want to see this in action? Follow for the next video where we build a real multi-agent crew live. 🚀
 ```
 
+## Analytics Feedback Loop (experimental)
+
+> Lives on the `feature/analytics-feedback` branch. A first-pass scaffold of
+> the feedback loop described in the roadmap below — not yet merged to `main`.
+
+`main_with_feedback.py` is a third entry point that runs the same 2-agent crew
+as `main.py`, but first analyzes the channel's recent videos and feeds the
+findings into the **YouTube Scriptwriter** task:
+
+1. **`analytics/youtube_analytics.py`** — calls the **YouTube Data API v3**
+   (`search.list` / `videos.list`, read-only, just an API key — no OAuth) to
+   pull a channel's recent videos: title, view count, like count, publish
+   date, duration.
+2. **`analytics/pattern_extractor.py`** — takes `(title, view_count,
+   publish_date)` tuples, computes simple per-title features (word count,
+   presence of a number, presence of a question mark, day of week posted),
+   and compares the top half vs bottom half of videos by views to find which
+   features correlate with higher view counts (using `scipy` for a p-value if
+   installed, otherwise a plain proportion/mean comparison).
+3. **`main_with_feedback.py`** — runs the above and injects the top
+   correlated patterns into the scriptwriter's task description, e.g.
+   *"Top-performing titles use numbers more often (62% vs 0%) — consider this
+   pattern when writing the title/hook."*
+
+```bash
+python main_with_feedback.py
+```
+
+### What's implemented
+
+- Fetching real public stats for any channel via the Data API (no OAuth).
+- Feature extraction + top-half/bottom-half correlation analysis.
+- A bundled sample dataset (`analytics/sample_videos.csv`) so the script runs
+  **out of the box with no extra API keys** — without `YOUTUBE_API_KEY` /
+  `YOUTUBE_CHANNEL_ID` it falls back to the sample data and still
+  demonstrates the full loop end-to-end.
+
+### What you need to provide for it to run on a real channel
+
+Set these in `.env` (see `.env.example`):
+
+- `GOOGLE_API_KEY` — Gemini key (same as `main.py`).
+- `YOUTUBE_API_KEY` — a YouTube Data API v3 key (enable the API in Google
+  Cloud Console and create an API key — read-only, no OAuth needed).
+- `YOUTUBE_CHANNEL_ID` — the `UC...` channel ID to analyze.
+
+### What's still missing for the full vision
+
+- **Real retention/CTR/impressions** — the Data API only exposes public
+  vanity metrics (views, likes). True audience retention and click-through
+  rate live behind the **YouTube Analytics API**, which requires OAuth and is
+  restricted to the channel owner. That's the natural next step.
+- **A true closed-loop feedback cycle** — right now this runs once, before
+  writing a script. The full vision re-runs analytics *after* a video is
+  published, to validate whether the suggested patterns actually moved the
+  needle, and refines the prompt over time based on real outcomes.
+- Only the lean pipeline (`main_with_feedback.py`) uses this so far; `app.py`'s
+  10-agent factory doesn't yet.
+
 ## Roadmap
 
 - [x] ~~Move the API key out of source and into environment variables / `.env`~~ — done, see `.env.example`
-- [ ] Hook up YouTube Analytics so the pipeline learns from real performance (views, retention, CTR) and feeds that back into the scriptwriting agent — this is the feature that turns the proof of concept into a real product
+- [ ] Hook up YouTube Analytics so the pipeline learns from real performance (views, retention, CTR) and feeds that back into the scriptwriting agent — this is the feature that turns the proof of concept into a real product (**scaffolded** on `feature/analytics-feedback`, see "Analytics Feedback Loop" above)
 
 See `progress.md` for the full status notes.
