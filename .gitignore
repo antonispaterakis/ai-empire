@@ -10,3 +10,13 @@ __pycache__/
 *.db
 *.log
 .claude/
+
+# YouTube OAuth credentials (user-specific, never commit)
+client_secret.json
+token.json
+
+# Analytics cache (auto-generated, refreshes every 24h)
+data/analytics_cache.json
+
+# CrewAI output
+final_script.txt

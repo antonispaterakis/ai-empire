@@ -1,74 +1,152 @@
 # AI Empire
 
-A multi-agent content pipeline built with [CrewAI](https://github.com/crewAIInc/crewAI) that researches trending AI news and turns it into ready-to-publish short-form video scripts (TikTok / YouTube Shorts), powered by Google Gemini.
+> An AI-powered content factory that watches your YouTube Analytics, learns what goes viral, and generates optimized short-form video packages automatically.
 
-> **Status:** in progress — proof of concept works; analytics feedback loop not yet built.
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![CrewAI](https://img.shields.io/badge/built%20with-CrewAI-orange)](https://github.com/crewAIInc/crewAI)
+[![Gemini](https://img.shields.io/badge/powered%20by-Google%20Gemini-4285F4)](https://ai.google.dev/)
 
-## What it does
+---
 
-Two entry points, two pipeline sizes:
+## The Idea
 
-- **`main.py`** — a lean 2-agent crew:
-  - **Trend Researcher** searches the web (DuckDuckGo) for the most viral AI news from the last 24 hours
-  - **YouTube Scriptwriter** turns that news into a 60-second script (Hook → Body → Call to Action)
-  - Output is written to `final_script.txt`
+Most AI content tools generate scripts in a vacuum. They have no idea what actually performs well on *your* channel.
 
-- **`app.py`** — a Streamlit UI fronting a 10-agent "content factory" crew (Trend Hunter, Scriptwriter, Title Master, Visual Director, Video Editor, Thumbnail Designer, SEO Expert, Social Media Manager, Voiceover Coach, General Manager) that produces a full content package — script, titles, image prompts, edit notes, thumbnail brief, SEO description/hashtags, captions, and voiceover direction — for any topic you give it.
+**AI Empire is different.** It plugs into your YouTube Analytics, studies what works (high CTR, strong retention, viral hooks) and what doesn't, and uses that data to guide an 11-agent production crew. Every video it creates is informed by real performance data. The more you use it, the smarter it gets.
 
-## Stack
+## How It Works
 
-- [CrewAI](https://github.com/crewAIInc/crewAI) for agent orchestration
-- Google Gemini via `langchain-google-genai` (`gemini-2.5-flash` for workers, `gemini-3.1-pro-preview` as manager)
-- DuckDuckGo search tool for live web research
-- [Streamlit](https://streamlit.io/) for the multi-agent UI (`app.py`)
+```
+┌─────────────────────────────────────────────────────────────┐
+│                       DATA LAYER                            │
+│                                                             │
+│  YouTube Analytics API ──► analytics_cache.json (24h TTL)   │
+│  Past Generated Scripts ──► production_history.json         │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   INTELLIGENCE LAYER                        │
+│                                                             │
+│  Performance Strategist reads both data sources and         │
+│  outputs a "Viral Strategy Brief":                          │
+│    • What topics are trending on YOUR channel               │
+│    • What hook styles drive retention                       │
+│    • What to avoid based on past underperformers            │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    PRODUCTION LAYER                         │
+│                                                             │
+│  10 specialized agents follow the brief:                    │
+│  Trend Hunter → Scriptwriter → Title Master →               │
+│  Visual Director → Video Editor → Thumbnail Designer →      │
+│  SEO Expert → Social Media Manager → Voiceover Coach →      │
+│  General Manager (assembles the final package)              │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+                           ▼
+                    ┌──────────────┐
+                    │  PUBLISH ON  │
+                    │   YOUTUBE    │──► Link video ID back
+                    └──────────────┘    to close the loop
+```
 
-## Setup
+## Quick Start
 
 ```bash
+git clone https://github.com/antonispaterakis/ai-empire.git
+cd ai-empire
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-```
 
-Copy `.env.example` to `.env` and add your Gemini API key (both `main.py` and `app.py` load it via `python-dotenv`):
-
-```bash
 cp .env.example .env
-# then edit .env and set GOOGLE_API_KEY=your-key-here
+# Edit .env and set GOOGLE_API_KEY=your-gemini-key
 ```
 
-Run the lean pipeline:
-
+**Run the lean 3-agent pipeline:**
 ```bash
-python main.py
+python3 main.py
 ```
 
-Or launch the full content-factory UI:
-
+**Run the full 11-agent Streamlit UI:**
 ```bash
 streamlit run app.py
 ```
 
-## Example Output
+## YouTube Analytics Setup (Optional)
 
-> The pipeline hasn't been run yet in this environment (no `GOOGLE_API_KEY` configured), so this is an **illustrative example** showing the expected `final_script.txt` structure from `main.py` — Hook → Body → Call to Action:
+The Strategist agent works out of the box with generic best practices, but it becomes powerful when connected to your real channel data.
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a project and enable **YouTube Data API v3** + **YouTube Analytics API**
+3. Create an **OAuth 2.0 Client ID** (Desktop app) under Credentials
+4. Download the JSON and save it as `client_secret.json` in the project root
+
+On first run, a browser window opens for authentication. After that, `token.json` is saved locally and you won't need to log in again.
+
+> **No credentials yet?** The system falls back gracefully to generic YouTube Shorts best practices. No crashes, no errors.
+
+## Closing the Feedback Loop
+
+After you publish a video that the pipeline generated:
+
+**Streamlit sidebar:** Select the run and enter the YouTube video ID.
+
+**CLI:**
+```bash
+python3 -c "from history_tool import link_video; link_video('RUN_ID', 'VIDEO_ID')"
+```
+
+Next time the pipeline runs, the Strategist cross-references the linked video's real performance with the hook and strategy it originally suggested, enabling it to learn what actually works.
+
+## Agent Configuration
+
+All 11 agents are defined in [`agents.yaml`](agents.yaml). You can tweak any agent's personality, goal, or instructions by editing this file. No Python changes needed.
+
+## Project Structure
 
 ```
-🎬 AI News Script (60 seconds)
-
-[HOOK]
-Google just dropped a Gemini update that's quietly changing how AI agents work — and almost nobody noticed.
-
-[BODY]
-The new model adds native multi-agent orchestration support, meaning teams of AI agents can now hand off tasks to each other without custom glue code. Early developers are already reporting builds that used to take a week now coming together in an afternoon. This isn't just a speed bump — it's a shift in how AI products get built.
-
-[CALL TO ACTION]
-Want to see this in action? Follow for the next video where we build a real multi-agent crew live. 🚀
+ai-empire/
+├── agents.yaml               # 11 agent definitions (role, goal, backstory)
+├── agent_loader.py            # YAML config parser
+├── app.py                     # 11-agent Streamlit UI
+├── main.py                    # 3-agent lean pipeline
+├── youtube_analytics_tool.py  # YouTube API + 24h cache + fallback
+├── history_tool.py            # Production history (save/link/read)
+├── requirements.txt
+├── .env.example
+└── data/
+    └── production_history.json  # Content memory (grows over time)
 ```
+
+## Stack
+
+| Component | Technology |
+|-----------|-----------|
+| Agent orchestration | [CrewAI](https://github.com/crewAIInc/crewAI) |
+| LLM (workers) | Google Gemini `gemini-2.5-flash` |
+| LLM (manager) | Google Gemini `gemini-3.1-pro-preview` |
+| Web research | DuckDuckGo Search |
+| Analytics | YouTube Data API v3 + YouTube Analytics API |
+| UI | [Streamlit](https://streamlit.io/) |
 
 ## Roadmap
 
-- [x] ~~Move the API key out of source and into environment variables / `.env`~~ — done, see `.env.example`
-- [ ] Hook up YouTube Analytics so the pipeline learns from real performance (views, retention, CTR) and feeds that back into the scriptwriting agent — this is the feature that turns the proof of concept into a real product
+- [x] Multi-agent content generation pipeline
+- [x] Streamlit UI with 11-agent content factory
+- [x] YouTube Analytics integration with Performance Strategist
+- [x] Production history with feedback loop (video linking)
+- [x] 24-hour analytics cache to prevent API quota drain
+- [x] Agent configs externalized to YAML
+- [ ] Auto-detect published videos (remove manual linking)
+- [ ] Streamlit dashboard showing performance trends over time
+- [ ] A/B test hook styles across multiple runs
 
-See `progress.md` for the full status notes.
+See [`progress.md`](progress.md) for detailed development notes.
+
+## License
+
+This project is open source. Clone it, fill in your API keys, and make it your own.
