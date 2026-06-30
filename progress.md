@@ -28,7 +28,7 @@ Three-layer system: **Data** (YouTube Analytics + production history) → **Inte
 
 - Two-agent CrewAI pipeline: Trend Researcher + YouTube Scriptwriter.
 - 10-agent Streamlit UI (content factory) in `app.py`.
-- Stack: CrewAI, Gemini (`gemini-2.5-flash` worker, `gemini-3.1-pro-preview` manager), DuckDuckGo search.
+- Stack: CrewAI, LangChain, DuckDuckGo search.
 - [x] ~~API key hardcoded in source~~ - moved to `.env` via `python-dotenv`.
 
 ## What's Next

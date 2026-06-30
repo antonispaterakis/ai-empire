@@ -4,7 +4,7 @@
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![CrewAI](https://img.shields.io/badge/built%20with-CrewAI-orange)](https://github.com/crewAIInc/crewAI)
-[![Gemini](https://img.shields.io/badge/powered%20by-Google%20Gemini-4285F4)](https://ai.google.dev/)
+
 
 ---
 
@@ -63,7 +63,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 cp .env.example .env
-# Edit .env and set GOOGLE_API_KEY=your-gemini-key
+# Edit .env and set GOOGLE_API_KEY=your-key
 ```
 
 **Run the lean 3-agent pipeline:**
@@ -127,8 +127,7 @@ ai-empire/
 | Component | Technology |
 |-----------|-----------|
 | Agent orchestration | [CrewAI](https://github.com/crewAIInc/crewAI) |
-| LLM (workers) | Google Gemini `gemini-2.5-flash` |
-| LLM (manager) | Google Gemini `gemini-3.1-pro-preview` |
+| LLM | Via `langchain-google-genai` (configurable in `main.py` / `app.py`) |
 | Web research | DuckDuckGo Search |
 | Analytics | YouTube Data API v3 + YouTube Analytics API |
 | UI | [Streamlit](https://streamlit.io/) |
