@@ -11,6 +11,7 @@ from youtube_analytics_tool import youtube_analytics_tool
 from history_tool import (
     history_tool, save_run, link_video, list_unlinked_runs,
 )
+from pattern_analysis_tool import pattern_analysis_tool
 
 load_dotenv()
 
@@ -88,7 +89,7 @@ if st.button("🚀 Ξεκίνα την Παραγωγή!", type="primary"):
             role=cfgs['performance_strategist']['role'],
             goal=cfgs['performance_strategist']['goal'],
             backstory=cfgs['performance_strategist']['backstory'],
-            tools=[youtube_analytics_tool, history_tool],
+            tools=[youtube_analytics_tool, history_tool, pattern_analysis_tool],
             llm=manager_llm, verbose=False, allow_delegation=False,
         )
         a['hunter'] = Agent(

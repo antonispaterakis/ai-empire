@@ -8,6 +8,7 @@ from langchain_community.tools import DuckDuckGoSearchRun
 from agent_loader import get_agent_config
 from youtube_analytics_tool import youtube_analytics_tool
 from history_tool import history_tool, save_run
+from pattern_analysis_tool import pattern_analysis_tool
 
 load_dotenv()
 
@@ -32,7 +33,7 @@ strategist = Agent(
     role=strategist_cfg['role'],
     goal=strategist_cfg['goal'],
     backstory=strategist_cfg['backstory'],
-    tools=[youtube_analytics_tool, history_tool],
+    tools=[youtube_analytics_tool, history_tool, pattern_analysis_tool],
     llm=manager_llm,
     verbose=True,
     allow_delegation=False,
