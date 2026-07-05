@@ -28,7 +28,7 @@ def _save_history(history: dict) -> None:
 def history_tool() -> str:
     """
     Reads the production history and returns a summary of all past content runs.
-    Use this to understand what scripts, hooks, and topics have been generated before.
+    Use this to understand what X (Twitter) threads, hooks, and topics have been generated before.
     """
     history = _load_history()
     runs = history.get('runs', [])
@@ -36,14 +36,14 @@ def history_tool() -> str:
     if not runs:
         return (
             "No production history yet. This is the first run. "
-            "Produce a strategy based on general YouTube Shorts best practices."
+            "Produce a strategy based on general X/Twitter best practices."
         )
 
     lines = [f"Production History ({len(runs)} past runs):\n"]
     # Show the most recent 10 runs
     for run in runs[-10:]:
-        linked = run.get('linked_video_id')
-        link_status = f" -> linked to video {linked}" if linked else " (not yet linked to a video)"
+        linked = run.get('linked_tweet_id')
+        link_status = f" -> published as tweet {linked}" if linked else " (not yet published)"
         lines.append(
             f"- [{run.get('created_at', '?')}] Topic: \"{run.get('topic', '?')}\" | "
             f"Hook: \"{run.get('hook', 'N/A')}\" | "
@@ -53,16 +53,14 @@ def history_tool() -> str:
 
     lines.append(
         "\nUse this data to find patterns: which topics and hook styles "
-        "have been tried, and (if linked) how they correlated with YouTube performance."
+        "have been tried, and (if linked) how they correlated with X (Twitter) performance."
     )
     return '\n'.join(lines)
 
 
-def save_run(topic: str, strategy_brief: str, hook: str,
-             script_summary: str, titles: list[str]) -> str:
+def save_run(topic: str, strategy_brief: str, hook: str, thread_summary: str) -> str:
     """
     Save a completed production run to the history.
-    Called after the General Manager finishes assembling the content package.
     Returns the run ID.
     """
     history = _load_history()
@@ -74,9 +72,8 @@ def save_run(topic: str, strategy_brief: str, hook: str,
         'topic': topic,
         'strategy_brief': strategy_brief,
         'hook': hook,
-        'script_summary': script_summary,
-        'titles': titles,
-        'linked_video_id': None,
+        'thread_summary': thread_summary,
+        'linked_tweet_id': None,
     }
 
     history['runs'].append(run_entry)
@@ -84,22 +81,20 @@ def save_run(topic: str, strategy_brief: str, hook: str,
     return run_id
 
 
-def link_video(run_id: str, video_id: str) -> bool:
+def link_tweet(run_id: str, tweet_id: str) -> bool:
     """
-    Link a published YouTube video ID to a past production run.
-    This closes the feedback loop so the Strategist can correlate
-    generated content with actual performance.
+    Link a published X tweet ID to a past production run.
     """
     history = _load_history()
     for run in history['runs']:
         if run['id'] == run_id:
-            run['linked_video_id'] = video_id
+            run['linked_tweet_id'] = tweet_id
             _save_history(history)
             return True
     return False
 
 
-def list_unlinked_runs() -> list[dict]:
-    """Return runs that haven't been linked to a YouTube video yet."""
+def list_unpublished_runs() -> list[dict]:
+    """Return runs that haven't been linked to an X post yet."""
     history = _load_history()
-    return [r for r in history['runs'] if r.get('linked_video_id') is None]
+    return [r for r in history['runs'] if r.get('linked_tweet_id') is None]

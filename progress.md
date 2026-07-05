@@ -31,11 +31,12 @@ Three-layer system: **Data** (YouTube Analytics + production history) → **Inte
 - Stack: CrewAI, LangChain, DuckDuckGo search.
 - [x] ~~API key hardcoded in source~~ - moved to `.env` via `python-dotenv`.
 
-## What's Next
+## What's Next (The "X Pivot")
 
-- Auto-detect published videos (remove need for manual linking).
-- Streamlit dashboard page showing performance trends over time.
-- A/B testing: generate multiple hook variants and track which style performs best.
+- **Pivot away from YouTube Analytics:** Shift the core focus to automating X (Twitter) content generation.
+- **Microservices Architecture:** Migrate the synchronous pipeline to a decoupled, cloud-ready architecture using FastAPI and Celery/Redis.
+- **Scraping Edge:** Develop a `Market Researcher` agent to scrape competitor tweets for viral hook structures using `tweepy` or the X API, abandoning local YouTube OAuth flow.
+- **Continuous Generation:** Set up a Celery Beat scheduler for automated daily content generation without user intervention.
 
 ## Design Decisions
 
